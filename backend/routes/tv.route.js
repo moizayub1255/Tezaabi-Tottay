@@ -1,15 +1,19 @@
 import express from "express";
 import {
-	getSimilarTvs,
-	getTrendingTv,
-	getTvDetails,
-	getTvsByCategory,
-	getTvTrailers,
+  getSimilarTvs,
+  getTrendingTv,
+  getTvDetails,
+  getTvsByCategory,
+  getTvTrailers,
+  getAllTvShows,
+  getPopularTvShows,
 } from "../controllers/tv.controller.js";
 
 const router = express.Router();
 
 router.get("/trending", getTrendingTv);
+router.get("/all", getAllTvShows);
+router.get("/popular", getPopularTvShows);
 router.get("/:id/trailers", getTvTrailers);
 router.get("/:id/details", getTvDetails);
 router.get("/:id/similar", getSimilarTvs);

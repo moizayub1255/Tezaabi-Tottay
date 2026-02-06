@@ -6,6 +6,7 @@ import WatchPage from "./pages/WatchPage";
 import Footer from "./components/Footer";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/authUser";
+import { useWatchlistStore } from "./store/watchlist";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import SearchPage from "./pages/SearchPage";
@@ -20,13 +21,26 @@ import CookiePreferences from "./pages/cookies/CookiePreferences";
 import CorporateInfo from "./pages/corporate/CorporateInfo";
 import About from "./pages/About";
 import Careers from "./pages/Careers";
+import ManageProfile from "./pages/ManageProfile";
+import AccountSettings from "./pages/AccountSettings";
+import MoviesPage from "./pages/MoviesPage";
+import TVShowsPage from "./pages/TVShowsPage";
+import PopularPage from "./pages/PopularPage";
+import MyListPage from "./pages/MyListPage";
 
 function App() {
   const { user, isCheckingAuth, authCheck } = useAuthStore();
+  const { loadWatchlist } = useWatchlistStore();
 
   useEffect(() => {
     authCheck();
   }, [authCheck]);
+
+  useEffect(() => {
+    if (user) {
+      loadWatchlist();
+    }
+  }, [user, loadWatchlist]);
 
   if (isCheckingAuth) {
     return (
@@ -61,6 +75,30 @@ function App() {
         <Route
           path="/history"
           element={user ? <SearchHistoryPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/movies"
+          element={user ? <MoviesPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/tv-shows"
+          element={user ? <TVShowsPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/popular"
+          element={user ? <PopularPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/my-list"
+          element={user ? <MyListPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/manage-profile"
+          element={user ? <ManageProfile /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/account-settings"
+          element={user ? <AccountSettings /> : <Navigate to={"/login"} />}
         />
         <Route path="/subscription" element={<Subscription />} />
         <Route path="/faq" element={<Faq />} />

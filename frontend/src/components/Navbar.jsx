@@ -24,12 +24,11 @@ const Navbar = () => {
 
   const navItems = [
     { name: "Home", path: "/", action: () => setContentType("movie") },
-    { name: "Movies", path: "/", action: () => setContentType("movie") },
-    { name: "TV Shows", path: "/", action: () => setContentType("tv") },
+    { name: "Movies", path: "/movies", action: () => setContentType("movie") },
+    { name: "TV Shows", path: "/tv-shows", action: () => setContentType("tv") },
     { name: "New & Popular", path: "/popular" },
     { name: "My List", path: "/my-list" },
-    { name: "History", path: "/history" },
-    { name: "Subscription", path: "/subscription" },
+    { name: "Search", path: "/search" },
   ];
 
   return (
@@ -135,25 +134,18 @@ const Navbar = () => {
 
                     <div className="py-2">
                       <Link
-                        to="/profile"
+                        to="/manage-profile"
                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 text-gray-300 hover:text-white transition-colors duration-200"
                       >
                         <User className="size-4" />
                         Manage Profile
                       </Link>
                       <Link
-                        to="/settings"
+                        to="/account-settings"
                         className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 text-gray-300 hover:text-white transition-colors duration-200"
                       >
                         <Settings className="size-4" />
                         Account Settings
-                      </Link>
-                      <Link
-                        to="/subscription"
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-white/10 text-gray-300 hover:text-white transition-colors duration-200"
-                      >
-                        <CreditCard className="size-4" />
-                        Manage Subscription
                       </Link>
                     </div>
 
