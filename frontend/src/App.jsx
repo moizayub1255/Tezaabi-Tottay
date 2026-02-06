@@ -11,40 +11,73 @@ import { Loader } from "lucide-react";
 import SearchPage from "./pages/SearchPage";
 import SearchHistoryPage from "./pages/SearchHistoryPage";
 import NotFoundPage from "./pages/404";
+import Subscription from "./pages/Subscription";
+import Faq from "./pages/faq/Faq";
+import HelpCenter from "./pages/help/HelpCenter";
+import Terms from "./pages/terms/Terms";
+import Privacy from "./pages/privacy/Privacy";
+import CookiePreferences from "./pages/cookies/CookiePreferences";
+import CorporateInfo from "./pages/corporate/CorporateInfo";
+import About from "./pages/About";
+import Careers from "./pages/Careers";
 
 function App() {
-	const { user, isCheckingAuth, authCheck } = useAuthStore();
+  const { user, isCheckingAuth, authCheck } = useAuthStore();
 
-	useEffect(() => {
-		authCheck();
-	}, [authCheck]);
+  useEffect(() => {
+    authCheck();
+  }, [authCheck]);
 
-	if (isCheckingAuth) {
-		return (
-			<div className='h-screen'>
-				<div className='flex justify-center items-center bg-black h-full'>
-					<Loader className='animate-spin text-red-600 size-10' />
-				</div>
-			</div>
-		);
-	}
+  if (isCheckingAuth) {
+    return (
+      <div className="h-screen">
+        <div className="flex justify-center items-center bg-black h-full">
+          <Loader className="animate-spin text-red-600 size-10" />
+        </div>
+      </div>
+    );
+  }
 
-	return (
-		<>
-			<Routes>
-				<Route path='/' element={<HomePage />} />
-				<Route path='/login' element={!user ? <LoginPage /> : <Navigate to={"/"} />} />
-				<Route path='/signup' element={!user ? <SignUpPage /> : <Navigate to={"/"} />} />
-				<Route path='/watch/:id' element={user ? <WatchPage /> : <Navigate to={"/login"} />} />
-				<Route path='/search' element={user ? <SearchPage /> : <Navigate to={"/login"} />} />
-				<Route path='/history' element={user ? <SearchHistoryPage /> : <Navigate to={"/login"} />} />
-				<Route path='/*' element={<NotFoundPage />} />
-			</Routes>
-			<Footer />
+  return (
+    <>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/login"
+          element={!user ? <LoginPage /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/signup"
+          element={!user ? <SignUpPage /> : <Navigate to={"/"} />}
+        />
+        <Route
+          path="/watch/:id"
+          element={user ? <WatchPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/search"
+          element={user ? <SearchPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/history"
+          element={user ? <SearchHistoryPage /> : <Navigate to={"/login"} />}
+        />
+        <Route path="/subscription" element={<Subscription />} />
+        <Route path="/faq" element={<Faq />} />
+        <Route path="/help" element={<HelpCenter />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/cookies" element={<CookiePreferences />} />
+        <Route path="/corporate" element={<CorporateInfo />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/careers" element={<Careers />} />
+        <Route path="/*" element={<NotFoundPage />} />
+      </Routes>
+      <Footer />
 
-			<Toaster />
-		</>
-	);
+      <Toaster />
+    </>
+  );
 }
 
 export default App;
