@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import { useNotificationStore } from "./notification";
 
 export const useWatchlistStore = create((set) => ({
   watchlist: [],
@@ -25,6 +26,13 @@ export const useWatchlistStore = create((set) => ({
 
       if (response.data.success) {
         set({ watchlist: response.data.watchlist });
+
+        // Add notification
+        useNotificationStore.getState().addNotification({
+          type: "success",
+          title: "Added to Watchlist",
+          message: `"${contentData.title}" has been added to your watchlist.`,
+        });
         return true;
       }
     } catch (error) {
@@ -33,6 +41,17 @@ export const useWatchlistStore = create((set) => ({
       if (!errorMessage.includes("Already in watchlist")) {
         // Don't show error if already in watchlist
         console.log(errorMessage);
+        useNotificationStore.getState().addNotification({
+          type: "error",
+          title: "Failed to Add",
+          message: errorMessage,
+        });
+      } else {
+        useNotificationStore.getState().addNotification({
+          type: "info",
+          title: "Already in Watchlist",
+          message: `"${contentData.title}" is already in your watchlist.`,
+        });
       }
       return false;
     }
@@ -46,12 +65,24 @@ export const useWatchlistStore = create((set) => ({
 
       if (response.data.success) {
         set({ watchlist: response.data.watchlist });
+
+        // Add notification
+        useNotificationStore.getState().addNotification({
+          type: "info",
+          title: "Removed from Watchlist",
+          message: "This item has been removed from your watchlist.",
+        });
         return true;
       }
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || "Failed to remove from watchlist";
       console.log(errorMessage);
+      useNotificationStore.getState().addNotification({
+        type: "error",
+        title: "Failed to Remove",
+        message: errorMessage,
+      });
       return false;
     }
   },

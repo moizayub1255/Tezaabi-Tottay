@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAuthStore } from "../store/authUser";
 import { useContentStore } from "../store/content";
+import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -72,10 +73,7 @@ const Navbar = () => {
           </Link>
 
           {/* Notifications */}
-          <button className="relative p-2 hover:bg-white/10 rounded-full transition-all duration-200 group hidden sm:block">
-            <Bell className="size-5 text-gray-300 group-hover:text-white group-hover:scale-110 transition-transform duration-200" />
-            <span className="absolute -top-1 -right-1 size-2.5 bg-red-600 rounded-full border-2 border-black" />
-          </button>
+          <NotificationDropdown />
 
           {/* Profile or Auth Buttons */}
           <div className="relative">

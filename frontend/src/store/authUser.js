@@ -1,6 +1,7 @@
 import axios from "axios";
 import toast from "react-hot-toast";
 import { create } from "zustand";
+import { useNotificationStore } from "./notification";
 
 export const useAuthStore = create((set) => ({
   user: null,
@@ -23,9 +24,21 @@ export const useAuthStore = create((set) => ({
       localStorage.setItem("tt_user", JSON.stringify(user));
       set({ user, isSigningUp: false });
       toast.success("Account created successfully");
+
+      // Add notification
+      useNotificationStore.getState().addNotification({
+        type: "success",
+        title: "Account Created",
+        message: `Welcome ${user.name}! Your account has been created successfully.`,
+      });
     } catch (error) {
       set({ isSigningUp: false });
       toast.error("Signup failed");
+      useNotificationStore.getState().addNotification({
+        type: "error",
+        title: "Signup Failed",
+        message: "An error occurred while creating your account.",
+      });
     }
   },
   signup: async (credentials) => {
@@ -34,9 +47,23 @@ export const useAuthStore = create((set) => ({
       const response = await axios.post("/api/v1/auth/signup", credentials);
       set({ user: response.data.user, isSigningUp: false });
       toast.success("Account created successfully");
+
+      // Add notification
+      useNotificationStore.getState().addNotification({
+        type: "success",
+        title: "Account Created",
+        message: `Welcome ${response.data.user.name}! Your account has been created successfully.`,
+      });
     } catch (error) {
       toast.error(error.response.data.message || "Signup failed");
       set({ isSigningUp: false, user: null });
+      useNotificationStore.getState().addNotification({
+        type: "error",
+        title: "Signup Failed",
+        message:
+          error.response.data.message ||
+          "An error occurred while creating your account.",
+      });
     }
   },
   login: async (credentials) => {
