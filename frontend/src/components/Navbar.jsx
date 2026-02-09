@@ -24,7 +24,11 @@ const Navbar = () => {
   const toggleProfileMenu = () => setIsProfileMenuOpen(!isProfileMenuOpen);
 
   const navItems = [
-    { name: "Home", path: "/", action: () => setContentType("movie") },
+    {
+      name: "Home",
+      path: user ? "/home" : "/",
+      action: () => setContentType("movie"),
+    },
     { name: "Movies", path: "/movies", action: () => setContentType("movie") },
     { name: "TV Shows", path: "/tv-shows", action: () => setContentType("tv") },
     { name: "New & Popular", path: "/popular" },

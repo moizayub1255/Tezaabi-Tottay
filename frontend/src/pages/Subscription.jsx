@@ -79,13 +79,13 @@ const Subscription = () => {
       localStorage.removeItem("tt_pending_signup");
       // save subscription info separately if needed
       localStorage.setItem("tt_subscription", JSON.stringify(userData.plan));
-      navigate("/");
+      navigate("/home");
     });
   };
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-8">
-          {/* Site Header */}
+      {/* Site Header */}
       <div className="max-w-7xl mx-auto">
         <Navbar />
 
@@ -99,54 +99,54 @@ const Subscription = () => {
             <p className="text-gray-400 text-lg">
               Watch all you want. Cancel anytime.
             </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className={`relative bg-gray-800 rounded-lg p-6 ${
-                  selectedPlan === plan.id ? "border-2 border-red-600" : ""
-                }`}
-              >
-                {plan.popular && (
-                  <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                    <span className="bg-red-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                      MOST POPULAR
-                    </span>
-                  </div>
-                )}
-
-                <div className="mb-6">
-                  <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                  <div className="flex items-baseline">
-                    <span className="text-4xl font-bold">{plan.price}</span>
-                    <span className="text-gray-400 ml-1">{plan.period}</span>
-                  </div>
-                </div>
-
-                <ul className="space-y-3 mb-6">
-                  {plan.features.map((feature, index) => (
-                    <li key={index} className="text-gray-300">
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <button
-                  className={`w-full py-3 rounded font-semibold transition duration-300 ${
-                    selectedPlan === plan.id
-                      ? "bg-red-600 hover:bg-red-700"
-                      : "bg-gray-700 hover:bg-gray-600"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {plans.map((plan) => (
+                <div
+                  key={plan.id}
+                  className={`relative bg-gray-800 rounded-lg p-6 ${
+                    selectedPlan === plan.id ? "border-2 border-red-600" : ""
                   }`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setSelectedPlan(plan.id);
-                  }}
                 >
-                  {selectedPlan === plan.id ? "SELECTED" : "SELECT PLAN"}
-                </button>
-              </div>
-            ))}
-          </div>
+                  {plan.popular && (
+                    <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-red-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                        MOST POPULAR
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="mb-6">
+                    <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
+                    <div className="flex items-baseline">
+                      <span className="text-4xl font-bold">{plan.price}</span>
+                      <span className="text-gray-400 ml-1">{plan.period}</span>
+                    </div>
+                  </div>
+
+                  <ul className="space-y-3 mb-6">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="text-gray-300">
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    className={`w-full py-3 rounded font-semibold transition duration-300 ${
+                      selectedPlan === plan.id
+                        ? "bg-red-600 hover:bg-red-700"
+                        : "bg-gray-700 hover:bg-gray-600"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedPlan(plan.id);
+                    }}
+                  >
+                    {selectedPlan === plan.id ? "SELECTED" : "SELECT PLAN"}
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Payment Section */}

@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import HomePage from "./pages/home/HomePage";
+import AuthScreen from "./pages/home/AuthScreen";
+import HomeScreen from "./pages/home/HomeScreen";
 import LoginPage from "./pages/LoginPage";
 import SignUpPage from "./pages/SignUpPage";
 import WatchPage from "./pages/WatchPage";
@@ -55,14 +56,21 @@ function App() {
   return (
     <>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route
+          path="/"
+          element={!user ? <AuthScreen /> : <Navigate to={"/home"} />}
+        />
+        <Route
+          path="/home"
+          element={user ? <HomeScreen /> : <Navigate to={"/login"} />}
+        />
         <Route
           path="/login"
-          element={!user ? <LoginPage /> : <Navigate to={"/"} />}
+          element={!user ? <LoginPage /> : <Navigate to={"/home"} />}
         />
         <Route
           path="/signup"
-          element={!user ? <SignUpPage /> : <Navigate to={"/"} />}
+          element={!user ? <SignUpPage /> : <Navigate to={"/home"} />}
         />
         <Route
           path="/watch/:id"

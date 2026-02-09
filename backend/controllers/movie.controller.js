@@ -20,13 +20,11 @@ export async function getAllMovies(req, res) {
     const data = await fetchFromTMDB(
       `https://api.themoviedb.org/3/discover/movie?language=en-US&page=${page}&sort_by=popularity.desc`,
     );
-    res
-      .status(200)
-      .json({
-        success: true,
-        movies: data.results,
-        totalPages: data.total_pages,
-      });
+    res.status(200).json({
+      success: true,
+      movies: data.results,
+      totalPages: data.total_pages,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
@@ -38,13 +36,11 @@ export async function getPopularMovies(req, res) {
     const data = await fetchFromTMDB(
       `https://api.themoviedb.org/3/movie/popular?language=en-US&page=${page}`,
     );
-    res
-      .status(200)
-      .json({
-        success: true,
-        movies: data.results,
-        totalPages: data.total_pages,
-      });
+    res.status(200).json({
+      success: true,
+      content: data.results,
+      totalPages: data.total_pages,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
@@ -56,13 +52,11 @@ export async function getUpcomingMovies(req, res) {
     const data = await fetchFromTMDB(
       `https://api.themoviedb.org/3/movie/upcoming?language=en-US&page=${page}`,
     );
-    res
-      .status(200)
-      .json({
-        success: true,
-        movies: data.results,
-        totalPages: data.total_pages,
-      });
+    res.status(200).json({
+      success: true,
+      content: data.results,
+      totalPages: data.total_pages,
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
