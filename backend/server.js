@@ -46,6 +46,11 @@ if (ENV_VARS.NODE_ENV === "production") {
   });
 }
 
+//health end point
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK" });
+});
+
 app.listen(PORT, () => {
   console.log("Server started at http://localhost:" + PORT);
   connectDB();
