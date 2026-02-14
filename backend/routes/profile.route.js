@@ -7,15 +7,14 @@ import {
   removeFromWatchlist,
   getWatchlist,
 } from "../controllers/profile.controller.js";
-import { protectRoute } from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
-router.get("/", protectRoute, getUserProfile);
-router.put("/update", protectRoute, updateUserProfile);
-router.put("/change-password", protectRoute, changePassword);
-router.get("/watchlist", protectRoute, getWatchlist);
-router.post("/watchlist/add", protectRoute, addToWatchlist);
-router.post("/watchlist/remove", protectRoute, removeFromWatchlist);
+router.get("/", getUserProfile);
+router.put("/update", updateUserProfile);
+router.put("/change-password", changePassword);
+router.get("/watchlist", getWatchlist);
+router.post("/watchlist/add", addToWatchlist);
+router.post("/watchlist/remove", removeFromWatchlist);
 
 export default router;

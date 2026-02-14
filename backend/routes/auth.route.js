@@ -6,10 +6,11 @@ import {
   logout,
   authCheck,
 } from "../controllers/auth.controller.js";
+import { protectRoute } from "../middleware/protectRoute.js";
 
 const router = express.Router();
 
-router.get("/authCheck", authCheck);
+router.get("/authCheck", protectRoute, authCheck);
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
