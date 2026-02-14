@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useContentStore } from "../store/content";
-import axios from "axios";
+import api from "../utils/api";
 import { Link } from "react-router-dom";
 import { SMALL_IMG_BASE_URL } from "../utils/constants";
 
@@ -16,7 +16,7 @@ const MovieSlider = ({ category }) => {
   useEffect(() => {
     const getContent = async () => {
       try {
-        const res = await axios.get(`/api/v1/${contentType}/${category}`);
+        const res = await api.get(`/api/v1/${contentType}/${category}`);
         setContent(res.data.content || []);
       } catch (error) {
         console.error("Error fetching content:", error);

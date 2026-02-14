@@ -1,4 +1,4 @@
-import axios from "axios";
+import api from "../utils/api";
 import toast from "react-hot-toast";
 import { create } from "zustand";
 import { useNotificationStore } from "./notification";
@@ -8,7 +8,7 @@ export const useWatchlistStore = create((set) => ({
 
   loadWatchlist: async () => {
     try {
-      const response = await axios.get("/api/v1/profile/watchlist");
+      const response = await api.get("/api/v1/profile/watchlist");
       if (response.data.success) {
         set({ watchlist: response.data.watchlist });
       }
@@ -19,7 +19,7 @@ export const useWatchlistStore = create((set) => ({
 
   addToWatchlist: async (contentData) => {
     try {
-      const response = await axios.post(
+      const response = await api.post(
         "/api/v1/profile/watchlist/add",
         contentData,
       );
@@ -59,7 +59,7 @@ export const useWatchlistStore = create((set) => ({
 
   removeFromWatchlist: async (contentId) => {
     try {
-      const response = await axios.post("/api/v1/profile/watchlist/remove", {
+      const response = await api.post("/api/v1/profile/watchlist/remove", {
         contentId,
       });
 

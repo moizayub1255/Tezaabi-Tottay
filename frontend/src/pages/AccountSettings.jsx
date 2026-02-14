@@ -10,7 +10,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import { useAuthStore } from "../store/authUser";
@@ -49,8 +49,8 @@ const AccountSettings = () => {
     const fetchSettings = async () => {
       try {
         const [notifRes, subRes] = await Promise.all([
-          axios.get("/api/v1/settings/notifications"),
-          axios.get("/api/v1/settings/subscription"),
+          api.get("/api/v1/settings/notifications"),
+          api.get("/api/v1/settings/subscription"),
         ]);
 
         if (notifRes.data.success) {
@@ -109,7 +109,7 @@ const AccountSettings = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.put("/api/v1/profile/change-password", {
+      const response = await api.put("/api/v1/profile/change-password", {
         oldPassword: securityForm.oldPassword,
         newPassword: securityForm.newPassword,
       });
@@ -136,7 +136,7 @@ const AccountSettings = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.put("/api/v1/settings/change-email", {
+      const response = await api.put("/api/v1/settings/change-email", {
         newEmail: emailForm.newEmail,
         password: emailForm.password,
       });
@@ -160,7 +160,7 @@ const AccountSettings = () => {
   const handleUpdateNotifications = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.put(
+      const response = await api.put(
         "/api/v1/settings/notifications",
         notifications,
       );
@@ -181,7 +181,7 @@ const AccountSettings = () => {
   const handleChangeSubscription = async (newPlan) => {
     setIsLoading(true);
     try {
-      const response = await axios.put("/api/v1/settings/subscription", {
+      const response = await api.put("/api/v1/settings/subscription", {
         plan: newPlan,
       });
 
@@ -212,7 +212,7 @@ const AccountSettings = () => {
 
     setIsLoading(true);
     try {
-      const response = await axios.delete("/api/v1/settings/delete-account", {
+      const response = await api.delete("/api/v1/settings/delete-account", {
         data: { password },
       });
 

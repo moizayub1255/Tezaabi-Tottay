@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Loader, Play, Plus, Check } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import { ORIGINAL_IMG_BASE_URL } from "../utils/constants";
@@ -22,7 +22,7 @@ const TVShowsPage = () => {
     const fetchTvShows = async () => {
       setIsLoading(true);
       try {
-        const response = await axios.get(`/api/v1/tv/all?page=${currentPage}`);
+        const response = await api.get(`/api/v1/tv/all?page=${currentPage}`);
         if (response.data.success) {
           setTvShows(response.data.tvShows);
           setTotalPages(response.data.totalPages);

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { useContentStore } from "../store/content";
-import axios from "axios";
+import api from "../utils/api";
 import Navbar from "../components/Navbar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ReactPlayer from "react-player";
@@ -23,7 +23,7 @@ const WatchPage = () => {
   useEffect(() => {
     const getTrailers = async () => {
       try {
-        const res = await axios.get(`/api/v1/${contentType}/${id}/trailers`);
+        const res = await api.get(`/api/v1/${contentType}/${id}/trailers`);
         setTrailers(res.data.trailers);
       } catch (error) {
         if (error.message.includes("404")) {
@@ -38,7 +38,7 @@ const WatchPage = () => {
   useEffect(() => {
     const getSimilarContent = async () => {
       try {
-        const res = await axios.get(`/api/v1/${contentType}/${id}/similar`);
+        const res = await api.get(`/api/v1/${contentType}/${id}/similar`);
         setSimilarContent(res.data.similar);
       } catch (error) {
         if (error.message.includes("404")) {
@@ -53,7 +53,7 @@ const WatchPage = () => {
   useEffect(() => {
     const getContentDetails = async () => {
       try {
-        const res = await axios.get(`/api/v1/${contentType}/${id}/details`);
+        const res = await api.get(`/api/v1/${contentType}/${id}/details`);
         setContent(res.data.content);
       } catch (error) {
         if (error.message.includes("404")) {
@@ -100,25 +100,24 @@ const WatchPage = () => {
   if (!content) {
     return (
       <div>
-          <Navbar />
-      <div className="bg-black text-white h-screen">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mx-auto px-4 py-8 h-full mt-40">
-            <h2 className="text-2xl sm:text-5xl font-bold text-balance">
-              Content not found 😥
-            </h2>
+        <Navbar />
+        <div className="bg-black text-white h-screen">
+          <div className="max-w-6xl mx-auto">
+            <div className="text-center mx-auto px-4 py-8 h-full mt-40">
+              <h2 className="text-2xl sm:text-5xl font-bold text-balance">
+                Content not found 😥
+              </h2>
+            </div>
           </div>
         </div>
-      </div>
       </div>
     );
   }
 
   return (
     <div className="bg-black min-h-screen text-white">
-        <Navbar />
+      <Navbar />
       <div className="mx-auto container px-4 py-8 h-full">
-
         {trailers.length > 0 && (
           <div className="flex justify-between items-center mb-4">
             <button

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Loader, Play, Plus, Check } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import { ORIGINAL_IMG_BASE_URL } from "../utils/constants";
@@ -24,7 +24,7 @@ const PopularPage = () => {
       setIsLoading(true);
       try {
         if (contentType === "movie") {
-          const response = await axios.get(
+          const response = await api.get(
             `/api/v1/movie/popular?page=${currentPage}`,
           );
           if (response.data.success) {
@@ -32,7 +32,7 @@ const PopularPage = () => {
             setTotalPages(response.data.totalPages);
           }
         } else {
-          const response = await axios.get(
+          const response = await api.get(
             `/api/v1/tv/popular?page=${currentPage}`,
           );
           if (response.data.success) {

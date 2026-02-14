@@ -1,5 +1,6 @@
 import express from "express";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import path from "path";
 
 import authRoutes from "./routes/auth.route.js";
@@ -20,6 +21,15 @@ const __dirname = path.resolve();
 
 app.use(express.json()); // will allow us to parse req.body
 app.use(cookieParser());
+
+// Enable CORS for frontend during development (and configured origin if provided)
+const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: true,
+  }),
+);
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/movie", protectRoute, movieRoutes);

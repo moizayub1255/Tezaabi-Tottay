@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ArrowLeft, Camera, Loader } from "lucide-react";
 import { Link } from "react-router-dom";
-import axios from "axios";
+import api from "../utils/api";
 import toast from "react-hot-toast";
 import Navbar from "../components/Navbar";
 import { useAuthStore } from "../store/authUser";
@@ -22,7 +22,7 @@ const ManageProfile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get("/api/v1/profile");
+        const response = await api.get("/api/v1/profile");
         if (response.data.success) {
           setFormData({
             firstName: response.data.user.firstName || "",
@@ -73,7 +73,7 @@ const ManageProfile = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.put("/api/v1/profile/update", formData);
+      const response = await api.put("/api/v1/profile/update", formData);
       if (response.data.success) {
         toast.success("Profile updated successfully");
         await authCheck();
