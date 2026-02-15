@@ -3,6 +3,7 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuthStore } from "../store/authUser";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState("standard");
@@ -57,6 +58,7 @@ const Subscription = () => {
   ];
 
   const createLocalAccount = useAuthStore((s) => s.createLocalAccount);
+  const signup = useAuthStore((s) => s.signup);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -66,19 +68,24 @@ const Subscription = () => {
     const pending = raw ? JSON.parse(raw) : null;
     const plan = plans.find((p) => p.id === selectedPlan);
 
-    // create a dummy local account and persist
-    const userData = {
-      email: pending?.email || "",
-      username: pending?.username || pending?.email?.split("@")[0] || "User",
-      plan: { id: plan.id, name: plan.name, price: plan.price },
-      image: "/avatar.png",
+    if (!pending || !pending.email || !pending.username || !pending.password) {
+      toast.error("Signup data is missing. Please sign up again.");
+      navigate("/signup");
+      return;
+    }
+
+    // Call the actual signup API to register user in database
+    const credentials = {
+      email: pending.email,
+      username: pending.username,
+      password: pending.password,
     };
 
-    createLocalAccount(userData).then(() => {
+    signup(credentials).then(() => {
       // cleanup pending data
       localStorage.removeItem("tt_pending_signup");
       // save subscription info separately if needed
-      localStorage.setItem("tt_subscription", JSON.stringify(userData.plan));
+      localStorage.setItem("tt_subscription", JSON.stringify(plan));
       navigate("/home");
     });
   };

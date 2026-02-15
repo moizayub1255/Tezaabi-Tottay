@@ -38,7 +38,7 @@ export async function getPopularMovies(req, res) {
     );
     res.status(200).json({
       success: true,
-      content: data.results,
+      movies: data.results,
       totalPages: data.total_pages,
     });
   } catch (error) {

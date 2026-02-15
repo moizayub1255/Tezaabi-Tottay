@@ -15,6 +15,10 @@ const SignUpPage = () => {
 
   const handleSignUp = (e) => {
     e.preventDefault();
+    // Validate form before proceeding
+    if (!email || !username || !password) {
+      return;
+    }
     // save pending signup data locally and proceed to subscription/payment
     const pending = { email, username, password };
     localStorage.setItem("tt_pending_signup", JSON.stringify(pending));
