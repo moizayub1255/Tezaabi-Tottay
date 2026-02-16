@@ -45,7 +45,8 @@ const Navbar = () => {
         {/* Left Section - Logo and Navigation */}
         <div className="flex items-center gap-8">
           <Link to="/" className="relative z-10 text-2xl font-extrabold">
-            <span className="text-red-600">TezabiTottay</span>
+            <span className="text-red-600">Tezabi</span>
+            <span className="text-white">Tottay</span>
           </Link>
 
           {/* Desktop Navigation */}
