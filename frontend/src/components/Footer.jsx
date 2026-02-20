@@ -9,8 +9,8 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row justify-between gap-14">
           {/* BRAND */}
           <div className="md:w-1/3">
-            <h3 className="text-2xl font-extrabold tracking-wide mb-4">
-              <span className="text-red-500">TezabiTottay</span>
+            <h3 className="h-35 w-40">
+              <img src="/tezabilogo.png" alt="" />
             </h3>
 
             <p className="text-gray-400 leading-relaxed mb-6">

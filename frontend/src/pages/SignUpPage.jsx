@@ -3,109 +3,107 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/authUser";
 
 const SignUpPage = () => {
-  const { searchParams } = new URL(document.location);
-  const emailValue = searchParams.get("email");
-
-  const [email, setEmail] = useState(emailValue || "");
+  const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-
-  const { isSigningUp } = useAuthStore();
+  const [errors, setErrors] = useState({});
+  const { signup, isSigningUp } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    // Validate form before proceeding
-    if (!email || !username || !password) {
-      return;
+    const newErrors = {};
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      newErrors.email = "Please enter a valid email address.";
     }
-    // save pending signup data locally and proceed to subscription/payment
-    const pending = { email, username, password };
-    localStorage.setItem("tt_pending_signup", JSON.stringify(pending));
+    // Username validation
+    if (!username) {
+      newErrors.username = "Username is required.";
+    }
+    // Password validations
+    if (!password) {
+      newErrors.password = "Password is required.";
+    } else {
+      if (password === username) {
+        newErrors.password = "Password cannot be the same as username.";
+      } else if (password.length < 8) {
+        newErrors.password = "Password must be at least 8 characters.";
+      } else if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+        newErrors.password =
+          "Password must include at least one special character.";
+      }
+    }
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+    await signup({ email, username, password });
     navigate("/subscription");
   };
 
   return (
-    <div className="h-screen w-full hero-bg">
+    <div className="min-h-screen w-full flex flex-col hero-bg">
       <header className="max-w-6xl mx-auto flex items-center justify-between p-4">
-        <Link to={"/"} className="text-3xl font-extrabold">
+        <Link to="/" className="text-3xl font-extrabold text-white">
           Tezaabi Tottay
         </Link>
       </header>
-
-      <div className="flex justify-center items-center mt-20 mx-3">
-        <div className="w-full max-w-md p-8 space-y-6 bg-black/60 rounded-lg shadow-md">
-          <h1 className="text-center text-white text-2xl font-bold mb-4">
+      <div className="flex flex-1 justify-center items-center">
+        <div className="w-full max-w-md p-8 space-y-6 bg-black/80 rounded-lg shadow-lg border border-gray-700">
+          <h1 className="text-2xl font-bold text-center text-white mb-4">
             Sign Up
           </h1>
-
           <form className="space-y-4" onSubmit={handleSignUp}>
             <div>
-              <label
-                htmlFor="email"
-                className="text-sm font-medium text-gray-300 block"
-              >
-                Email
-              </label>
               <input
                 type="email"
-                className="w-full px-3 py-2 mt-1 border border-gray-700 rounded-md bg-transparent text-white focus:outline-none focus:ring"
-                placeholder="you@example.com"
-                id="email"
+                className="w-full px-3 py-2 border border-gray-700 rounded-md bg-transparent text-white"
+                placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
+              {errors.email && (
+                <div className="text-red-400 text-sm mt-1">{errors.email}</div>
+              )}
             </div>
-
             <div>
-              <label
-                htmlFor="username"
-                className="text-sm font-medium text-gray-300 block"
-              >
-                Username
-              </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 mt-1 border border-gray-700 rounded-md bg-transparent text-white focus:outline-none focus:ring"
-                placeholder="johndoe"
-                id="username"
+                className="w-full px-3 py-2 border border-gray-700 rounded-md bg-transparent text-white"
+                placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                required
               />
+              {errors.username && (
+                <div className="text-red-400 text-sm mt-1">
+                  {errors.username}
+                </div>
+              )}
             </div>
-
             <div>
-              <label
-                htmlFor="password"
-                className="text-sm font-medium text-gray-300 block"
-              >
-                Password
-              </label>
               <input
                 type="password"
-                className="w-full px-3 py-2 mt-1 border border-gray-700 rounded-md bg-transparent text-white focus:outline-none focus:ring"
-                placeholder="••••••••"
-                id="password"
+                className="w-full px-3 py-2 border border-gray-700 rounded-md bg-transparent text-white"
+                placeholder="Password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
+              {errors.password && (
+                <div className="text-red-400 text-sm mt-1">
+                  {errors.password}
+                </div>
+              )}
             </div>
-
             <button
-              className="w-full py-2 bg-red-600 text-white font-semibold rounded-md
-							hover:bg-red-700
-						"
+              className="w-full py-2 bg-red-600 text-white font-semibold rounded-md hover:bg-red-700"
               disabled={isSigningUp}
             >
-              {isSigningUp ? "Loading..." : "Sign Up"}
+              {isSigningUp ? "Signing Up..." : "Sign Up"}
             </button>
           </form>
-          <div className="text-center text-gray-400">
-            Already a member?{" "}
-            <Link to={"/login"} className="text-red-500 hover:underline">
-              Sign in
-            </Link>
-          </div>
         </div>
       </div>
     </div>

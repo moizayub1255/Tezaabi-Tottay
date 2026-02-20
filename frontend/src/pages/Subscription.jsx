@@ -8,6 +8,10 @@ import toast from "react-hot-toast";
 const Subscription = () => {
   const [selectedPlan, setSelectedPlan] = useState("chaotic");
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expiry, setExpiry] = useState("");
+  const [cvv, setCvv] = useState("");
+  const [cardErrors, setCardErrors] = useState({});
 
   const plans = [
     {
@@ -67,15 +71,36 @@ const Subscription = () => {
     const plan = plans.find((p) => p.id === selectedPlan);
 
     if (!pending || !pending.email || !pending.username || !pending.password) {
-      toast.error("Signup data is missing. Please sign up again.");
-      navigate("/signup");
+      // If signup data is missing, do nothing (account is likely already created)
+      // Optionally, show a less intrusive message or just return silently
       return;
     }
+
+    // Card validation if credit/debit card selected
+    let errors = {};
+    if (paymentMethod === "credit-card") {
+      if (!/^\d{16}$/.test(cardNumber)) {
+        errors.cardNumber = "Card number must be 16 digits.";
+      }
+      if (!/^\d{2}\/\d{2}$/.test(expiry)) {
+        errors.expiry = "Expiry must be MM/YY format.";
+      }
+      if (!/^\d{3,4}$/.test(cvv)) {
+        errors.cvv = "CVV must be 3 or 4 digits.";
+      }
+    }
+    setCardErrors(errors);
+    if (Object.keys(errors).length > 0) return;
 
     const credentials = {
       email: pending.email,
       username: pending.username,
       password: pending.password,
+      plan: plan.id,
+      paymentMethod,
+      cardNumber: paymentMethod === "credit-card" ? cardNumber : undefined,
+      expiry: paymentMethod === "credit-card" ? expiry : undefined,
+      cvv: paymentMethod === "credit-card" ? cvv : undefined,
     };
 
     signup(credentials).then(() => {
@@ -170,6 +195,56 @@ const Subscription = () => {
                 </div>
               ))}
             </div>
+
+            {paymentMethod === "credit-card" && (
+              <form className="space-y-4 mb-8">
+                <div>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-700 rounded-md bg-transparent text-white"
+                    placeholder="Card Number (16 digits)"
+                    value={cardNumber}
+                    onChange={(e) => setCardNumber(e.target.value)}
+                    maxLength={16}
+                  />
+                  {cardErrors.cardNumber && (
+                    <div className="text-red-400 text-sm mt-1">
+                      {cardErrors.cardNumber}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-700 rounded-md bg-transparent text-white"
+                    placeholder="Expiry (MM/YY)"
+                    value={expiry}
+                    onChange={(e) => setExpiry(e.target.value)}
+                    maxLength={5}
+                  />
+                  {cardErrors.expiry && (
+                    <div className="text-red-400 text-sm mt-1">
+                      {cardErrors.expiry}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-700 rounded-md bg-transparent text-white"
+                    placeholder="CVV (3 or 4 digits)"
+                    value={cvv}
+                    onChange={(e) => setCvv(e.target.value)}
+                    maxLength={4}
+                  />
+                  {cardErrors.cvv && (
+                    <div className="text-red-400 text-sm mt-1">
+                      {cardErrors.cvv}
+                    </div>
+                  )}
+                </div>
+              </form>
+            )}
           </div>
 
           <div className="bg-gray-900 rounded-lg p-6 md:p-8 mb-8">
