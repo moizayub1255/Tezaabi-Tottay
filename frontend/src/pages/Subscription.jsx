@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useAuthStore } from "../store/authUser";
@@ -62,6 +62,7 @@ const Subscription = () => {
   ];
 
   const signup = useAuthStore((s) => s.signup);
+  const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
@@ -107,10 +108,17 @@ const Subscription = () => {
       if (res && res.success !== false) {
         localStorage.removeItem("tt_pending_signup");
         localStorage.setItem("tt_subscription", JSON.stringify(plan));
-        navigate("/home");
+        // navigation will be handled by useEffect below
       }
     });
   };
+
+  // Navigate to /home when user is set after signup
+  useEffect(() => {
+    if (user) {
+      navigate("/home");
+    }
+  }, [user, navigate]);
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-8">
