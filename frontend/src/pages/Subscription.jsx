@@ -63,12 +63,18 @@ const Subscription = () => {
     setCardErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
-    // TODO: Replace with actual signup form values
-    // Example: Add username, email, password fields to your form and use them here
+    // Get signup data from localStorage
+    const pendingSignup = JSON.parse(localStorage.getItem("tt_pending_signup"));
+    if (!pendingSignup) {
+      toast.error(
+        "Signup information missing. Please start from the signup page.",
+      );
+      return;
+    }
     const credentials = {
-      username: "testuser", // Replace with actual username input
-      email: "testuser@example.com", // Replace with actual email input
-      password: "Test@1234", // Replace with actual password input
+      username: pendingSignup.username,
+      email: pendingSignup.email,
+      password: pendingSignup.password,
       plan: selectedPlan,
       paymentMethod,
       cardNumber,
@@ -258,11 +264,11 @@ const Subscription = () => {
               onClick={handleSubmit}
               className="bg-red-600 hover:bg-red-700 text-white text-xl font-bold py-4 px-12 rounded transition duration-300 transform hover:scale-105"
             >
-              ACCEPT MY FATE
+              Create Account
             </button>
-            <p className="text-gray-400 mt-4 text-sm">
+            {/* <p className="text-gray-400 mt-4 text-sm">
               By clicking this, you agree that this was probably a bad idea.
-            </p>
+            </p> */}
           </div>
         </div>
       </div>
