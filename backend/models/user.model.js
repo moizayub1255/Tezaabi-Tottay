@@ -39,14 +39,24 @@ const userSchema = mongoose.Schema({
     type: String,
     default: "",
   },
+  subscription: {
+    plan: {
+      type: String,
+      enum: ["basic", "standard", "premium"],
+      default: "basic",
+    },
+    validUntil: {
+      type: Date,
+      default: null,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
   country: {
     type: String,
     default: "",
-  },
-  subscriptionPlan: {
-    type: String,
-    enum: ["broke", "chaotic", "overkill"],
-    default: "broke",
   },
   watchlist: {
     type: Array,

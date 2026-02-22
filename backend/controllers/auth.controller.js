@@ -7,12 +7,10 @@ export async function signup(req, res) {
     const { email, password, username, plan } = req.body;
 
     if (!email || !password || !username || !plan) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "All fields are required, including subscription plan",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required, including subscription plan",
+      });
     }
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -20,7 +18,7 @@ export async function signup(req, res) {
       return res.status(400).json({ success: false, message: "Invalid email" });
     }
     // Validate plan
-    const validPlans = ["broke", "chaotic", "overkill"];
+    const validPlans = ["basic", "standard", "premium"];
     if (!validPlans.includes(plan)) {
       return res
         .status(400)
@@ -28,12 +26,10 @@ export async function signup(req, res) {
     }
 
     if (password.length < 6) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "Password must be at least 6 characters",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
     }
 
     const existingUserByEmail = await User.findOne({ email: email });

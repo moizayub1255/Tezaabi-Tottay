@@ -6,51 +6,37 @@ import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const Subscription = () => {
-  const [selectedPlan, setSelectedPlan] = useState("chaotic");
+  const [selectedPlan, setSelectedPlan] = useState("basic");
   const [paymentMethod, setPaymentMethod] = useState("credit-card");
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
   const [cardErrors, setCardErrors] = useState({});
+  const navigate = useNavigate();
 
   const plans = [
     {
-      id: "broke",
-      name: "Broke but Hopeful",
-      price: "$0.99",
+      id: "basic",
+      name: "Basic",
+      price: "$4.99",
       period: "/month",
-      features: [
-        "✓ Access to absolutely nothing",
-        "✓ Occasional motivational quotes",
-        "✓ 1 random bug per week",
-        "✓ Feeling of financial responsibility",
-      ],
+      features: ["✓ Watch Movies", "✗ TV Shows", "✗ Premium/Exclusive Content"],
       popular: false,
     },
     {
-      id: "chaotic",
-      name: "Chaotic Neutral",
-      price: "$12.34",
+      id: "standard",
+      name: "Standard",
+      price: "$9.99",
       period: "/month",
-      features: [
-        "✓ Features may or may not work",
-        "✓ Surprise UI changes at midnight",
-        "✓ Priority confusion support",
-        "✓ Emotional rollercoaster included",
-      ],
+      features: ["✓ Watch Movies", "✓ TV Shows", "✗ Premium/Exclusive Content"],
       popular: true,
     },
     {
-      id: "overkill",
-      name: "Overkill Deluxe",
-      price: "$99.99",
+      id: "premium",
+      name: "Premium",
+      price: "$14.99",
       period: "/month",
-      features: [
-        "✓ Everything from other plans (probably)",
-        "✓ Fake VIP feeling",
-        "✓ Developer sends you good vibes",
-        "✓ Bragging rights with zero benefits",
-      ],
+      features: ["✓ Watch Movies", "✓ TV Shows", "✓ Premium/Exclusive Content"],
       popular: false,
     },
   ];
@@ -58,27 +44,11 @@ const Subscription = () => {
   const paymentMethods = [
     { id: "credit-card", name: "Credit or Debit Card", icon: "💳" },
     { id: "paypal", name: "PayPal", icon: "🔗" },
-    { id: "google-pay", name: "Google Pay", icon: "📱" },
   ];
 
-  const signup = useAuthStore((s) => s.signup);
-  const user = useAuthStore((s) => s.user);
-  const navigate = useNavigate();
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const raw = localStorage.getItem("tt_pending_signup");
-    const pending = raw ? JSON.parse(raw) : null;
-    const plan = plans.find((p) => p.id === selectedPlan);
-
-    if (!pending || !pending.email || !pending.username || !pending.password) {
-      // If signup data is missing, do nothing (account is likely already created)
-      // Optionally, show a less intrusive message or just return silently
-      return;
-    }
-
-    // Card validation if credit/debit card selected
-    let errors = {};
+  const { signup } = useAuthStore();
+  const handleSubmit = async () => {
+    const errors = {};
     if (paymentMethod === "credit-card") {
       if (!/^\d{16}$/.test(cardNumber)) {
         errors.cardNumber = "Card number must be 16 digits.";
@@ -93,27 +63,25 @@ const Subscription = () => {
     setCardErrors(errors);
     if (Object.keys(errors).length > 0) return;
 
+    // TODO: Replace with actual signup form values
+    // Example: Add username, email, password fields to your form and use them here
     const credentials = {
-      email: pending.email,
-      username: pending.username,
-      password: pending.password,
-      plan: plan.id,
+      username: "testuser", // Replace with actual username input
+      email: "testuser@example.com", // Replace with actual email input
+      password: "Test@1234", // Replace with actual password input
+      plan: selectedPlan,
       paymentMethod,
-      cardNumber: paymentMethod === "credit-card" ? cardNumber : undefined,
-      expiry: paymentMethod === "credit-card" ? expiry : undefined,
-      cvv: paymentMethod === "credit-card" ? cvv : undefined,
+      cardNumber,
+      expiry,
+      cvv,
     };
-
-    signup(credentials).then((res) => {
-      if (res && res.success !== false) {
-        localStorage.removeItem("tt_pending_signup");
-        localStorage.setItem("tt_subscription", JSON.stringify(plan));
-        // navigation will be handled by useEffect below
-      }
-    });
+    await signup(credentials);
+    // Navigation will be handled by useEffect when user is set
   };
 
   // Navigate to /home when user is set after signup
+  const { user } = useAuthStore();
+
   useEffect(() => {
     if (user) {
       navigate("/home");
