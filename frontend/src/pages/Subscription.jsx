@@ -103,16 +103,18 @@ const Subscription = () => {
       cvv: paymentMethod === "credit-card" ? cvv : undefined,
     };
 
-    signup(credentials).then(() => {
-      localStorage.removeItem("tt_pending_signup");
-      localStorage.setItem("tt_subscription", JSON.stringify(plan));
-      navigate("/home");
+    signup(credentials).then((res) => {
+      if (res && res.success !== false) {
+        localStorage.removeItem("tt_pending_signup");
+        localStorage.setItem("tt_subscription", JSON.stringify(plan));
+        navigate("/home");
+      }
     });
   };
 
   return (
     <div className="min-h-screen bg-black text-white p-4 md:p-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max- mx-auto">
         <Navbar />
 
         <div className="max-w-6xl mx-auto">

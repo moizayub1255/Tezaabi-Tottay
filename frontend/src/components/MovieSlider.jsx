@@ -84,4 +84,4 @@ const MovieSlider = ({ category }) => {
     </div>
   );
 };
-export default MovieSlider;
+export default MovieSlider

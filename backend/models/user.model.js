@@ -45,8 +45,8 @@ const userSchema = mongoose.Schema({
   },
   subscriptionPlan: {
     type: String,
-    enum: ["free", "basic", "standard", "premium"],
-    default: "free",
+    enum: ["broke", "chaotic", "overkill"],
+    default: "broke",
   },
   watchlist: {
     type: Array,

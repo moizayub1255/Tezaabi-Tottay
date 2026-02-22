@@ -37,7 +37,11 @@ const SignUpPage = () => {
     }
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
-    await signup({ email, username, password });
+    // Save signup data to localStorage and redirect to subscription page
+    localStorage.setItem(
+      "tt_pending_signup",
+      JSON.stringify({ email, username, password }),
+    );
     navigate("/subscription");
   };
 
