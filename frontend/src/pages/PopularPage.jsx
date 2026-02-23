@@ -28,7 +28,7 @@ const PopularPage = () => {
             `/api/v1/movie/popular?page=${currentPage}`,
           );
           if (response.data.success) {
-            setContent(response.data.movies);
+            setContent(response.data.movies || []);
             setTotalPages(response.data.totalPages);
           }
         } else {
@@ -36,7 +36,7 @@ const PopularPage = () => {
             `/api/v1/tv/popular?page=${currentPage}`,
           );
           if (response.data.success) {
-            setContent(response.data.tvShows);
+            setContent(response.data.tvShows || []);
             setTotalPages(response.data.totalPages);
           }
         }
@@ -77,6 +77,18 @@ const PopularPage = () => {
     return (
       <div className="h-screen bg-black text-white flex items-center justify-center">
         <p>Please log in to access this page</p>
+      </div>
+    );
+  }
+  // Subscription plan check
+  const plan = user.subscription?.plan || user.plan || "basic";
+  if (plan !== "premium") {
+    return (
+      <div className="h-screen bg-black text-white flex items-center justify-center">
+        <p>
+          Your current subscription does not allow access to New & Popular.
+          Upgrade to Premium to access this section.
+        </p>
       </div>
     );
   }
@@ -131,7 +143,7 @@ const PopularPage = () => {
           <div className="flex justify-center items-center h-96">
             <Loader className="animate-spin text-red-600 size-10" />
           </div>
-        ) : content.length === 0 ? (
+        ) : (Array.isArray(content) ? content.length === 0 : true) ? (
           <div className="text-center py-12">
             <p className="text-gray-400 text-lg">No content found</p>
           </div>

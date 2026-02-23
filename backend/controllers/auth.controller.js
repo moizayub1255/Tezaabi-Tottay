@@ -60,7 +60,11 @@ export async function signup(req, res) {
       password: hashedPassword,
       username,
       image,
-      subscriptionPlan: plan,
+      subscription: {
+        plan: plan,
+        isActive: true,
+        validUntil: null,
+      },
     });
 
     generateTokenAndSetCookie(newUser._id, res);

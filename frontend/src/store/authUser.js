@@ -92,7 +92,20 @@ export const useAuthStore = create((set) => ({
     try {
       const response = await api.get("/api/v1/auth/authCheck");
 
-      set({ user: response.data.user, isCheckingAuth: false });
+      // Fetch subscription plan from backend
+      let user = response.data.user;
+      try {
+        const subRes = await api.get("/api/v1/settings/subscription");
+        if (subRes.data.success && subRes.data.subscriptionPlan) {
+          user = {
+            ...user,
+            subscription: { plan: subRes.data.subscriptionPlan },
+          };
+        }
+      } catch (e) {
+        // fallback: keep user as is
+      }
+      set({ user, isCheckingAuth: false });
     } catch (error) {
       // fallback to localStorage (dummy/local account)
       const raw = localStorage.getItem("tt_user");

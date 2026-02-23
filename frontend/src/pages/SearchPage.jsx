@@ -9,6 +9,14 @@ import { Link } from "react-router-dom";
 
 const SearchPage = () => {
   const [activeTab, setActiveTab] = useState("movie");
+  // Get user and plan
+  let user = null;
+  let plan = "basic";
+  try {
+    const authStore = require("../store/authUser");
+    user = authStore.useAuthStore.getState().user;
+    plan = user?.subscription?.plan || user?.plan || "basic";
+  } catch {}
   const [searchTerm, setSearchTerm] = useState("");
 
   const [results, setResults] = useState([]);
@@ -16,7 +24,7 @@ const SearchPage = () => {
 
   const handleTabClick = (tab) => {
     setActiveTab(tab);
-    tab === "movie" ? setContentType("movie") : setContentType("tv");
+    setContentType(tab);
     setResults([]);
   };
 
@@ -36,52 +44,74 @@ const SearchPage = () => {
     }
   };
 
+  // Plan-based tab filtering
+  const showMovies =
+    plan === "basic" || plan === "standard" || plan === "premium";
+  const showTV = plan === "standard" || plan === "premium";
+  const showPerson = true;
+
   return (
     <div className="bg-black min-h-screen text-white">
       <Navbar />
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center gap-3 mb-4">
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "movie" ? "bg-red-600" : "bg-gray-800"
-            } hover:bg-red-700`}
-            onClick={() => handleTabClick("movie")}
-          >
-            Movies
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "tv" ? "bg-red-600" : "bg-gray-800"
-            } hover:bg-red-700`}
-            onClick={() => handleTabClick("tv")}
-          >
-            Series
-          </button>
-          <button
-            className={`py-2 px-4 rounded ${
-              activeTab === "person" ? "bg-red-600" : "bg-gray-800"
-            } hover:bg-red-700`}
-            onClick={() => handleTabClick("person")}
-          >
-            Person
-          </button>
+          {showMovies && (
+            <button
+              className={`py-2 px-4 rounded ${
+                activeTab === "movie" ? "bg-red-600" : "bg-gray-800"
+              } hover:bg-red-700`}
+              onClick={() => handleTabClick("movie")}
+            >
+              Movies
+            </button>
+          )}
+          {showTV && (
+            <button
+              className={`py-2 px-4 rounded ${
+                activeTab === "tv" ? "bg-red-600" : "bg-gray-800"
+              } hover:bg-red-700`}
+              onClick={() => handleTabClick("tv")}
+            >
+              Series
+            </button>
+          )}
+          {showPerson && (
+            <button
+              className={`py-2 px-4 rounded ${
+                activeTab === "person" ? "bg-red-600" : "bg-gray-800"
+              } hover:bg-red-700`}
+              onClick={() => handleTabClick("person")}
+            >
+              Person
+            </button>
+          )}
         </div>
 
-        <form
-          className="flex gap-2 items-stretch mb-8 max-w-2xl mx-auto"
-          onSubmit={handleSearch}
-        >
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder={"Search for a " + activeTab}
-            className="w-full p-2 rounded bg-gray-800 text-white"
-          />
-          <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded">
-            <Search className="size-6" />
-          </button>
-        </form>
+        {/* Restrict search form if plan doesn't allow */}
+        {(!showMovies && activeTab === "movie") ||
+        (!showTV && activeTab === "tv") ? (
+          <div className="text-center text-red-400 mb-8">
+            {activeTab === "movie"
+              ? "Your current subscription does not allow searching for movies."
+              : "Your current subscription does not allow searching for TV series."}
+          </div>
+        ) : (
+          <form
+            className="flex gap-2 items-stretch mb-8 max-w-2xl mx-auto"
+            onSubmit={handleSearch}
+          >
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={"Search for a " + activeTab}
+              className="w-full p-2 rounded bg-gray-800 text-white"
+            />
+            <button className="bg-red-600 hover:bg-red-700 text-white p-2 rounded">
+              <Search className="size-6" />
+            </button>
+          </form>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {results.map((result) => {

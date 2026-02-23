@@ -10,7 +10,7 @@ const Footer = () => {
           {/* BRAND */}
           <div className="md:w-1/3">
             <h3 className="h-35 w-40">
-              <img src="/tezabilogo.png" alt="" />
+              <img src="/tezabilog.png" alt="" />
             </h3>
 
             <p className="text-gray-400 leading-relaxed mb-6">
@@ -90,9 +90,7 @@ const Footer = () => {
                 </li>
                 <li className="text-gray-400">
                   Questions? Call{" "}
-                  <p className="text-white font-medium">
-                    1-844-505-2993
-                  </p>
+                  <p className="text-white font-medium">1-844-505-2993</p>
                 </li>
               </ul>
             </div>

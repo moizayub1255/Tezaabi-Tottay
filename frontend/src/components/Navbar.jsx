@@ -47,7 +47,7 @@ const Navbar = () => {
           <Link to="/" className="h-35 w-40">
             {/* <span className="text-red-600">Tezabi</span>
             <span className="text-white">Tottay</span> */}
-            <img src="/tezabilogo.png" alt="" />
+            <img src="/tezabilog.png" alt="" />
           </Link>
 
           {/* Desktop Navigation */}

@@ -17,6 +17,7 @@ const ManageProfile = () => {
     phone: "",
     country: "",
     image: "",
+    email: "",
   });
 
   useEffect(() => {
@@ -31,6 +32,7 @@ const ManageProfile = () => {
             phone: response.data.user.phone || "",
             country: response.data.user.country || "",
             image: response.data.user.image || "",
+            email: response.data.user.email || "",
           });
         }
       } catch (error) {
@@ -252,9 +254,11 @@ const ManageProfile = () => {
                 </label>
                 <input
                   type="email"
-                  value={user?.email || ""}
-                  readOnly
-                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 cursor-not-allowed"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:border-red-600 transition"
+                  placeholder="your@email.com"
                 />
               </div>
               <div>
@@ -263,7 +267,12 @@ const ManageProfile = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.subscriptionPlan || "Free"}
+                  value={
+                    user?.subscription?.plan
+                      ? user.subscription.plan.charAt(0).toUpperCase() +
+                        user.subscription.plan.slice(1)
+                      : "Basic"
+                  }
                   readOnly
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-gray-400 cursor-not-allowed capitalize"
                 />

@@ -65,6 +65,15 @@ const MoviesPage = () => {
       </div>
     );
   }
+  // Subscription plan check
+  const plan = user.subscription?.plan || user.plan || "basic";
+  if (plan !== "basic" && plan !== "standard" && plan !== "premium") {
+    return (
+      <div className="h-screen bg-black text-white flex items-center justify-center">
+        <p>Your subscription plan is invalid. Please contact support.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">

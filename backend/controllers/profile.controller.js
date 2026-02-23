@@ -39,7 +39,7 @@ export async function getUserProfile(req, res) {
 export async function updateUserProfile(req, res) {
   try {
     const userId = req.user.id;
-    const { firstName, lastName, bio, phone, country, image } = req.body;
+    const { firstName, lastName, bio, phone, country, image, email } = req.body;
 
     const user = await User.findById(userId);
 
@@ -55,6 +55,23 @@ export async function updateUserProfile(req, res) {
     if (phone) user.phone = phone;
     if (country) user.country = country;
     if (image) user.image = image;
+    if (email && email !== user.email) {
+      // Check if email is valid
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid email format" });
+      }
+      // Check if email already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser && existingUser._id.toString() !== user._id.toString()) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Email already in use" });
+      }
+      user.email = email;
+    }
     user.updatedAt = new Date();
 
     await user.save();

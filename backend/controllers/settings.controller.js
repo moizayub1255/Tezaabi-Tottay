@@ -4,7 +4,7 @@ import bcryptjs from "bcryptjs";
 // Update notification settings
 export async function updateNotificationSettings(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { emailNotifications, newReleases, promotions } = req.body;
 
     const user = await User.findById(userId);
@@ -45,7 +45,7 @@ export async function updateNotificationSettings(req, res) {
 // Get notification settings
 export async function getNotificationSettings(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const user = await User.findById(userId);
 
     if (!user) {
@@ -67,7 +67,7 @@ export async function getNotificationSettings(req, res) {
 // Update subscription plan
 export async function updateSubscriptionPlan(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { plan } = req.body;
 
     if (!plan) {
@@ -76,7 +76,7 @@ export async function updateSubscriptionPlan(req, res) {
         .json({ success: false, message: "Plan is required" });
     }
 
-    const validPlans = ["free", "basic", "standard", "premium"];
+    const validPlans = ["basic", "standard", "premium"];
     if (!validPlans.includes(plan)) {
       return res
         .status(400)
@@ -91,17 +91,20 @@ export async function updateSubscriptionPlan(req, res) {
         .json({ success: false, message: "User not found" });
     }
 
-    user.subscriptionPlan = plan;
+    user.subscription.plan = plan;
     user.updatedAt = new Date();
     await user.save();
 
     res.status(200).json({
       success: true,
       message: `Subscription updated to ${plan}`,
-      subscriptionPlan: user.subscriptionPlan,
+      subscriptionPlan: user.subscription.plan,
     });
   } catch (error) {
-    console.log("Error in updateSubscriptionPlan controller", error.message);
+    console.log("Error in updateSubscriptionPlan controller");
+    console.log("req.user:", req.user);
+    console.log("req.body:", req.body);
+    console.log("error stack:", error.stack);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
@@ -109,10 +112,23 @@ export async function updateSubscriptionPlan(req, res) {
 // Get subscription plan
 export async function getSubscriptionPlan(req, res) {
   try {
-    const userId = req.user.id;
+    if (!req.user || !req.user._id) {
+      console.log(
+        "getSubscriptionPlan: req.user is missing or invalid",
+        req.user,
+      );
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "Unauthorized: user not found in request",
+        });
+    }
+    const userId = req.user._id;
     const user = await User.findById(userId);
 
     if (!user) {
+      console.log("getSubscriptionPlan: User not found for id", userId);
       return res
         .status(404)
         .json({ success: false, message: "User not found" });
@@ -120,10 +136,12 @@ export async function getSubscriptionPlan(req, res) {
 
     res.status(200).json({
       success: true,
-      subscriptionPlan: user.subscriptionPlan,
+      subscriptionPlan: user.subscription?.plan || "basic",
     });
   } catch (error) {
-    console.log("Error in getSubscriptionPlan controller", error.message);
+    console.log("Error in getSubscriptionPlan controller", error);
+    console.log("req.user:", req.user);
+    console.log("error stack:", error.stack);
     res.status(500).json({ success: false, message: "Internal server error" });
   }
 }
@@ -131,7 +149,7 @@ export async function getSubscriptionPlan(req, res) {
 // Change email
 export async function changeEmail(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { newEmail, password } = req.body;
 
     if (!newEmail || !password) {
@@ -190,7 +208,7 @@ export async function changeEmail(req, res) {
 // Delete account
 export async function deleteAccount(req, res) {
   try {
-    const userId = req.user.id;
+    const userId = req.user._id;
     const { password } = req.body;
 
     if (!password) {

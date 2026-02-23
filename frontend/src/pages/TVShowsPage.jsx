@@ -67,6 +67,18 @@ const TVShowsPage = () => {
       </div>
     );
   }
+  // Subscription plan check
+  const plan = user.subscription?.plan || user.plan || "basic";
+  if (plan === "basic") {
+    return (
+      <div className="h-screen bg-black text-white flex items-center justify-center">
+        <p>
+          Your current subscription does not allow access to TV Shows. Upgrade
+          to Standard or Premium to watch TV Shows.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white">
