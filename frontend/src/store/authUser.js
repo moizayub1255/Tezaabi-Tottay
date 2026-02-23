@@ -3,12 +3,13 @@ import toast from "react-hot-toast";
 import { create } from "zustand";
 import { useNotificationStore } from "./notification";
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   user: null,
   isSigningUp: false,
   isCheckingAuth: true,
   isLoggingOut: false,
   isLoggingIn: false,
+  skipLocalStorageFallback: false,
   // create a local (dummy) account and persist to localStorage
   createLocalAccount: async (userData) => {
     set({ isSigningUp: true });
@@ -77,19 +78,20 @@ export const useAuthStore = create((set) => ({
     }
   },
   logout: async () => {
-    set({ isLoggingOut: true });
+    set({ isLoggingOut: true, skipLocalStorageFallback: true });
     try {
       await api.post("/api/v1/auth/logout");
       set({ user: null, isLoggingOut: false });
       toast.success("Logged out successfully");
     } catch (error) {
-      set({ isLoggingOut: false });
-      // Only show error if not after account deletion
-      if (!error.response?.data?.message?.includes("Account deleted")) {
-        toast.error(error.response.data.message || "Logout failed");
-      }
+      // Even if API call fails, still clear user state and navigate
+      set({ user: null, isLoggingOut: false, skipLocalStorageFallback: false });
+      // Don't show error - just complete the logout locally
     }
   },
+  // Function to set flag to skip localStorage fallback after logout
+  setSkipLocalStorageFallback: (value) =>
+    set({ skipLocalStorageFallback: value }),
   authCheck: async () => {
     set({ isCheckingAuth: true });
     try {
@@ -108,8 +110,21 @@ export const useAuthStore = create((set) => ({
       } catch (e) {
         // fallback: keep user as is
       }
-      set({ user, isCheckingAuth: false });
+      set({ user, isCheckingAuth: false, skipLocalStorageFallback: false });
     } catch (error) {
+      // Check if we should skip localStorage fallback (after logout)
+      const shouldSkipFallback = get().skipLocalStorageFallback;
+
+      if (shouldSkipFallback) {
+        // Reset the flag and set user to null
+        set({
+          isCheckingAuth: false,
+          user: null,
+          skipLocalStorageFallback: false,
+        });
+        return;
+      }
+
       // fallback to localStorage (dummy/local account)
       const raw = localStorage.getItem("tt_user");
       if (raw) {

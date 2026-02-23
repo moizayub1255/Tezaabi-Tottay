@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   LogOut,
   Menu,
@@ -15,6 +15,7 @@ import { useContentStore } from "../store/content";
 import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const { user, logout } = useAuthStore();
@@ -23,10 +24,11 @@ const Navbar = () => {
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
   const toggleProfileMenu = () => setIsProfileMenuOpen(!isProfileMenuOpen);
 
+  // Always show Home as '/' if user is null
   const navItems = [
     {
       name: "Home",
-      path: user ? "/home" : "/",
+      path: user && user.name ? "/home" : "/",
       action: () => setContentType("movie"),
     },
     { name: "Movies", path: "/movies", action: () => setContentType("movie") },
@@ -159,7 +161,8 @@ const Navbar = () => {
                           await logout();
                           setIsProfileMenuOpen(false);
                           localStorage.removeItem("tt_user");
-                          window.location.href = "/";
+                          // Use React Router navigate for proper SPA navigation
+                          navigate("/");
                         }}
                         className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/10 text-red-500 hover:text-red-400 transition-colors duration-200"
                       >
@@ -225,9 +228,12 @@ const Navbar = () => {
                   </div>
                 ) : (
                   <button
-                    onClick={() => {
-                      logout();
+                    onClick={async () => {
+                      await logout();
                       setIsMobileMenuOpen(false);
+                      localStorage.removeItem("tt_user");
+                      // Use React Router navigate for proper SPA navigation
+                      navigate("/");
                     }}
                     className="flex items-center gap-3 w-full px-4 py-3 text-lg text-red-500 hover:text-red-400 hover:bg-white/10 rounded-lg transition-all duration-200"
                   >
