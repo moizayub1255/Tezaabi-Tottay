@@ -155,9 +155,11 @@ const Navbar = () => {
 
                     <div className="border-t border-gray-800 pt-2">
                       <button
-                        onClick={() => {
-                          logout();
+                        onClick={async () => {
+                          await logout();
                           setIsProfileMenuOpen(false);
+                          localStorage.removeItem("tt_user");
+                          window.location.href = "/";
                         }}
                         className="flex items-center gap-3 w-full px-4 py-3 hover:bg-white/10 text-red-500 hover:text-red-400 transition-colors duration-200"
                       >

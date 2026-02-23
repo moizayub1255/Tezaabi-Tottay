@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../utils/api";
+import { useAuthStore } from "../store/authUser";
 import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import toast from "react-hot-toast";
 
 import {
   ArrowLeft,
@@ -17,36 +21,27 @@ const AccountSettings = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [subscription, setSubscription] = useState("basic");
+
   // Fetch current subscription plan from backend
   useEffect(() => {
     const fetchSubscription = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5001/api/v1/settings/subscription",
-          {
-            method: "GET",
-            credentials: "include",
-          },
-        );
-        const data = await response.json();
-        if (data.success && data.subscriptionPlan) {
-          setSubscription(data.subscriptionPlan);
+        const response = await api.get("/api/v1/settings/subscription");
+        if (response.data.success && response.data.subscriptionPlan) {
+          setSubscription(response.data.subscriptionPlan);
         }
       } catch (err) {
-        // Handle error
+        console.error("Error fetching subscription:", err);
       }
     };
     fetchSubscription();
   }, []);
+
   const [pendingSubscription, setPendingSubscription] = useState(null);
 
   const [emailForm, setEmailForm] = useState({
     newEmail: "",
     password: "",
-  });
-
-  const [notifications, setNotifications] = useState({
-    promotions: false,
   });
 
   // ---------------- Handlers ----------------
@@ -58,40 +53,65 @@ const AccountSettings = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch(
-        "http://localhost:5001/api/v1/profile/update",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ email: emailForm.newEmail }),
-        },
-      );
-      const data = await response.json();
-      if (data.success) {
-        // Optionally show success toast or update UI
+      const response = await api.put("/api/v1/settings/change-email", {
+        newEmail: emailForm.newEmail,
+        password: emailForm.password,
+      });
+
+      if (response.data.success) {
+        toast.success("Email updated successfully!");
         setEmailForm({ newEmail: "", password: "" });
-        // Optionally refresh user info in store
-      } else {
-        // Optionally show error toast
       }
     } catch (err) {
-      // Optionally show error toast
+      const errorMessage =
+        err.response?.data?.message || "Failed to update email";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDeleteAccount = () => {
-    console.log("Delete account");
-  };
+  const navigate = useNavigate();
+  const { user, logout } = useAuthStore();
 
-  const handleNotificationChange = (e) => {
-    setNotifications({ ...notifications, [e.target.name]: e.target.checked });
-  };
+  // Redirect if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
 
-  const handleUpdateNotifications = () => {
-    console.log("Update notifications:", notifications);
+  const handleDeleteAccount = async () => {
+    const password = window.prompt(
+      "Please enter your password to confirm account deletion:",
+    );
+    if (!password) return;
+
+    setIsLoading(true);
+    try {
+      const response = await api.delete("/api/v1/auth/deleteAccount", {
+        data: { password },
+      });
+
+      if (response.data.success) {
+        toast.success("Account deleted successfully");
+        // Clear user state manually if needed
+        localStorage.removeItem("tt_user");
+        // Optionally call logout, but ignore its error
+        try {
+          await logout();
+        } catch (e) {
+          // ignore logout error after deletion
+        }
+        navigate("/");
+      }
+    } catch (err) {
+      const errorMessage =
+        err.response?.data?.message || "Error deleting account";
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleChangeSubscription = (plan) => {
@@ -102,29 +122,29 @@ const AccountSettings = () => {
     if (!pendingSubscription || pendingSubscription === subscription) return;
     setIsLoading(true);
     try {
-      // Replace with your actual API endpoint
-      const response = await fetch(
-        "http://localhost:5001/api/v1/settings/subscription",
-        {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ plan: pendingSubscription }),
-        },
-      );
-      const data = await response.json();
-      if (data.success) {
+      const response = await api.put("/api/v1/settings/subscription", {
+        plan: pendingSubscription,
+      });
+
+      if (response.data.success) {
         setSubscription(pendingSubscription);
         setPendingSubscription(null);
+        toast.success(`Subscription updated to ${pendingSubscription}`);
       }
     } catch (err) {
-      // Handle error
+      const errorMessage =
+        err.response?.data?.message || "Failed to update subscription";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   // ---------------- UI ----------------
+  if (!user) {
+    return null; // Will redirect to login
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
       <Navbar />
@@ -142,7 +162,6 @@ const AccountSettings = () => {
         <div className="flex gap-2 mb-8 border-b border-gray-800">
           {[
             { id: "security", label: "Security", icon: Lock },
-            { id: "notifications", label: "Notifications", icon: Bell },
             { id: "subscription", label: "Subscription", icon: CreditCard },
           ].map(({ id, label, icon: Icon }) => (
             <button
@@ -186,13 +205,17 @@ const AccountSettings = () => {
                   name="password"
                   value={emailForm.password}
                   onChange={handleEmailChange}
-                  placeholder="Password"
+                  placeholder="Password (required for verification)"
                   className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg"
                   required
                 />
 
-                <button className="bg-red-600 px-6 py-2 rounded-lg w-full">
-                  Update Email
+                <button
+                  type="submit"
+                  className="bg-red-600 px-6 py-2 rounded-lg w-full disabled:opacity-50"
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Updating..." : "Update Email"}
                 </button>
               </form>
             </div>
@@ -204,37 +227,19 @@ const AccountSettings = () => {
                 <h2 className="text-xl font-semibold">Danger Zone</h2>
               </div>
 
+              <p className="text-gray-400 mb-4">
+                Once you delete your account, there is no going back. Please be
+                certain.
+              </p>
+
               <button
                 onClick={handleDeleteAccount}
-                className="bg-red-600 px-6 py-2 rounded-lg"
+                className="bg-red-600 px-6 py-2 rounded-lg disabled:opacity-50"
+                disabled={isLoading}
               >
-                Delete Account
+                {isLoading ? "Deleting..." : "Delete Account"}
               </button>
             </div>
-          </div>
-        )}
-
-        {/* ---------------- NOTIFICATIONS ---------------- */}
-        {activeTab === "notifications" && (
-          <div className="bg-gray-900 rounded-lg p-8 border border-gray-800 space-y-6">
-            <h2 className="text-xl font-semibold">Notification Settings</h2>
-
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                name="promotions"
-                checked={notifications.promotions}
-                onChange={handleNotificationChange}
-              />
-              Promotions
-            </label>
-
-            <button
-              onClick={handleUpdateNotifications}
-              className="bg-red-600 px-6 py-2 rounded-lg w-full"
-            >
-              Save Preferences
-            </button>
           </div>
         )}
 
@@ -242,7 +247,8 @@ const AccountSettings = () => {
         {activeTab === "subscription" && (
           <div className="bg-gray-900 rounded-lg p-8 border border-gray-800">
             <h2 className="text-xl font-semibold mb-6">
-              Current Plan: {subscription}
+              Current Plan:{" "}
+              {subscription.charAt(0).toUpperCase() + subscription.slice(1)}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -252,11 +258,11 @@ const AccountSettings = () => {
                   onClick={() => handleChangeSubscription(plan)}
                   className={`p-6 rounded-lg border ${
                     (pendingSubscription || subscription) === plan
-                      ? "border-red-600"
+                      ? "border-red-600 bg-red-600/20"
                       : "border-gray-700"
                   }`}
                 >
-                  {plan.toUpperCase()}
+                  {plan.charAt(0).toUpperCase() + plan.slice(1)}
                   {pendingSubscription === plan && " (Selected)"}
                 </button>
               ))}
@@ -264,7 +270,7 @@ const AccountSettings = () => {
             {pendingSubscription && pendingSubscription !== subscription && (
               <button
                 onClick={handleConfirmSubscription}
-                className="bg-red-600 px-6 py-2 rounded-lg w-full mb-2"
+                className="bg-red-600 px-6 py-2 rounded-lg w-full mb-2 disabled:opacity-50"
                 disabled={isLoading}
               >
                 {isLoading ? "Updating..." : "Confirm Update"}
@@ -277,12 +283,14 @@ const AccountSettings = () => {
         <div className="mt-12">
           <Link
             to="/manage-profile"
-            className="px-6 py-3 bg-gray-800 rounded-lg"
+            className="px-6 py-3 bg-gray-800 rounded-lg inline-block"
           >
             Manage Profile
           </Link>
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 };

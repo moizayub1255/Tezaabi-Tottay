@@ -1,3 +1,19 @@
+export async function deleteAccount(req, res) {
+  try {
+    const userId = req.user?._id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized" });
+    }
+    await User.findByIdAndDelete(userId);
+    res.clearCookie("jwt-netflix");
+    return res
+      .status(200)
+      .json({ success: true, message: "Account deleted permanently" });
+  } catch (error) {
+    console.log("Error in deleteAccount controller", error.message);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+}
 import { User } from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import { generateTokenAndSetCookie } from "../utils/generateToken.js";

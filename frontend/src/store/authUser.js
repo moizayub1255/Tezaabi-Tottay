@@ -84,7 +84,10 @@ export const useAuthStore = create((set) => ({
       toast.success("Logged out successfully");
     } catch (error) {
       set({ isLoggingOut: false });
-      toast.error(error.response.data.message || "Logout failed");
+      // Only show error if not after account deletion
+      if (!error.response?.data?.message?.includes("Account deleted")) {
+        toast.error(error.response.data.message || "Logout failed");
+      }
     }
   },
   authCheck: async () => {
